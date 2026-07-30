@@ -1,0 +1,39 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: hourblue-mysql
+    restart: unless-stopped
+    env_file:
+      - backend/.env
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-hourblue}
+      MYSQL_USER: ${MYSQL_USER:-hourblue}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-hourblue_local_dev}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_local_dev}
+    ports:
+      - "3306:3306"
+    volumes:
+      - hourblue-mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-root_local_dev}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+    container_name: hourblue-backend
+    restart: unless-stopped
+    env_file:
+      - backend/.env
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-hourblue}
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  hourblue-mysql-data:

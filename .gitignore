@@ -1,6 +1,21 @@
+# IDE
 .idea/
-   *.iml
-   node_modules/
-   target/
-   .env
-   .env.local
+*.iml
+.vscode/
+
+# Backend (Maven/Java)
+target/
+
+# Frontend (Node/Next.js)
+node_modules/
+.next/
+out/
+
+# Env files - never commit secrets
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db

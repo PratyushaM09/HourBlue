@@ -34,7 +34,17 @@ hourblue/
 
 ## Local Development
 
-Setup instructions will be added here once the initial scaffolding (Milestone 1) is complete - see the Implementation Roadmap in docs/PLANNING.md.
+Quick start (from the repo root):
+
+```
+cp backend/.env.example backend/.env      # fill in values, see backend/README.md
+cp frontend/.env.local.example frontend/.env.local
+
+docker compose up --build                  # MySQL + backend
+cd frontend && npm install && npm run dev  # frontend, in a second terminal
+```
+
+See `backend/README.md` and `frontend/README.md` for details on each side, and `docs/PLANNING.md` Section 6.4 for the environments overview.
 
 ## Documentation
 
