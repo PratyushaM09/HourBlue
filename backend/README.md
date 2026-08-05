@@ -34,7 +34,7 @@ New schema changes go in a new versioned file, e.g. `V2__add_something.sql`, nev
 ## Package layout
 
 - `controller/` — REST endpoints, thin, delegate to services
-- `service/` — business logic (related-photos query, slug generation, etc. land here)
+- `service/` — business logic (related-posts query, slug generation, etc. land here)
 - `repository/` — Spring Data JPA repositories
 - `model/` — JPA entities
 - `dto/` — request/response records

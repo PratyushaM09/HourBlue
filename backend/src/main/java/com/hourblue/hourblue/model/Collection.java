@@ -16,8 +16,8 @@ public class Collection {
     @Column(nullable = false, unique = true, length = 120)
     private String slug;
 
-    @Column(name = "cover_photo_id")
-    private Long coverPhotoId;
+    @Column(name = "cover_post_id")
+    private Long coverPostId;
 
     @Column(name = "display_order", nullable = false)
     private int displayOrder = 0;
@@ -49,12 +49,12 @@ public class Collection {
         this.slug = slug;
     }
 
-    public Long getCoverPhotoId() {
-        return coverPhotoId;
+    public Long getCoverPostId() {
+        return coverPostId;
     }
 
-    public void setCoverPhotoId(Long coverPhotoId) {
-        this.coverPhotoId = coverPhotoId;
+    public void setCoverPostId(Long coverPostId) {
+        this.coverPostId = coverPostId;
     }
 
     public int getDisplayOrder() {

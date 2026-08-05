@@ -9,7 +9,7 @@ CREATE TABLE admin_user (
     CONSTRAINT uq_admin_user_username UNIQUE (username)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE photo (
+CREATE TABLE post (
     id             BIGINT AUTO_INCREMENT PRIMARY KEY,
     slug           VARCHAR(255) NOT NULL,
     image_url      VARCHAR(500) NOT NULL,
@@ -23,48 +23,48 @@ CREATE TABLE photo (
     is_featured    BOOLEAN NOT NULL DEFAULT FALSE,
     created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT uq_photo_slug UNIQUE (slug)
+    CONSTRAINT uq_post_slug UNIQUE (slug)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE INDEX idx_photo_place_date ON photo (place, captured_date);
-CREATE INDEX idx_photo_captured_date ON photo (captured_date);
-CREATE FULLTEXT INDEX ftx_photo_caption_place ON photo (caption, place);
+CREATE INDEX idx_post_place_date ON post (place, captured_date);
+CREATE INDEX idx_post_captured_date ON post (captured_date);
+CREATE FULLTEXT INDEX ftx_post_caption_place ON post (caption, place);
 
 CREATE TABLE collection (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
     name            VARCHAR(100) NOT NULL,
     slug            VARCHAR(120) NOT NULL,
-    cover_photo_id  BIGINT NULL,
+    cover_post_id   BIGINT NULL,
     display_order   INT NOT NULL DEFAULT 0,
     CONSTRAINT uq_collection_name UNIQUE (name),
     CONSTRAINT uq_collection_slug UNIQUE (slug),
-    CONSTRAINT fk_collection_cover_photo FOREIGN KEY (cover_photo_id) REFERENCES photo (id) ON DELETE SET NULL
+    CONSTRAINT fk_collection_cover_post FOREIGN KEY (cover_post_id) REFERENCES post (id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE mood (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
     name            VARCHAR(100) NOT NULL,
     slug            VARCHAR(120) NOT NULL,
-    cover_photo_id  BIGINT NULL,
+    cover_post_id   BIGINT NULL,
     display_order   INT NOT NULL DEFAULT 0,
     CONSTRAINT uq_mood_name UNIQUE (name),
     CONSTRAINT uq_mood_slug UNIQUE (slug),
-    CONSTRAINT fk_mood_cover_photo FOREIGN KEY (cover_photo_id) REFERENCES photo (id) ON DELETE SET NULL
+    CONSTRAINT fk_mood_cover_post FOREIGN KEY (cover_post_id) REFERENCES post (id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE photo_collection (
-    photo_id       BIGINT NOT NULL,
+CREATE TABLE post_collection (
+    post_id        BIGINT NOT NULL,
     collection_id  BIGINT NOT NULL,
-    PRIMARY KEY (photo_id, collection_id),
-    CONSTRAINT fk_pc_photo FOREIGN KEY (photo_id) REFERENCES photo (id) ON DELETE CASCADE,
+    PRIMARY KEY (post_id, collection_id),
+    CONSTRAINT fk_pc_post FOREIGN KEY (post_id) REFERENCES post (id) ON DELETE CASCADE,
     CONSTRAINT fk_pc_collection FOREIGN KEY (collection_id) REFERENCES collection (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE photo_mood (
-    photo_id  BIGINT NOT NULL,
+CREATE TABLE post_mood (
+    post_id   BIGINT NOT NULL,
     mood_id   BIGINT NOT NULL,
-    PRIMARY KEY (photo_id, mood_id),
-    CONSTRAINT fk_pm_photo FOREIGN KEY (photo_id) REFERENCES photo (id) ON DELETE CASCADE,
+    PRIMARY KEY (post_id, mood_id),
+    CONSTRAINT fk_pm_post FOREIGN KEY (post_id) REFERENCES post (id) ON DELETE CASCADE,
     CONSTRAINT fk_pm_mood FOREIGN KEY (mood_id) REFERENCES mood (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

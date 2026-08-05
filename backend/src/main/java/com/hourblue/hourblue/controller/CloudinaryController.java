@@ -14,7 +14,7 @@ import java.util.TreeMap;
 /**
  * Admin-only: generates a Cloudinary signed-upload signature (Section 5.5).
  * Cloudinary credentials never reach the frontend - the browser uploads directly to
- * Cloudinary using this signature, then posts the resulting URLs to /api/admin/photos.
+ * Cloudinary using this signature, then posts the resulting URLs to /api/admin/posts.
  */
 @RestController
 @RequestMapping("/api/admin/uploads")

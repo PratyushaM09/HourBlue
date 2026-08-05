@@ -12,8 +12,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "photo")
-public class Photo {
+@Table(name = "post")
+public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,21 +59,21 @@ public class Photo {
 
     @ManyToMany
     @JoinTable(
-            name = "photo_collection",
-            joinColumns = @JoinColumn(name = "photo_id"),
+            name = "post_collection",
+            joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "collection_id")
     )
     private Set<Collection> collections = new HashSet<>();
 
     @ManyToMany
     @JoinTable(
-            name = "photo_mood",
-            joinColumns = @JoinColumn(name = "photo_id"),
+            name = "post_mood",
+            joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "mood_id")
     )
     private Set<Mood> moods = new HashSet<>();
 
-    public Photo() {
+    public Post() {
     }
 
     // --- Getters & setters ---
