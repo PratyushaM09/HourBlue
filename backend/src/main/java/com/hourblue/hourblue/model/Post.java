@@ -1,5 +1,6 @@
 package com.hourblue.hourblue.model;
 
+import com.hourblue.hourblue.model.enums.ContentType;
 import com.hourblue.hourblue.model.enums.Weather;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -22,6 +23,13 @@ public class Post {
     @Column(nullable = false, unique = true, length = 255)
     private String slug;
 
+    @Column(nullable = false, length = 180)
+    private String title;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "content_type", nullable = false, length = 40)
+    private ContentType contentType = ContentType.IMAGE;
+
     @Column(name = "image_url", nullable = false, length = 500)
     private String imageUrl;
 
@@ -31,8 +39,20 @@ public class Post {
     @Column(name = "medium_url", nullable = false, length = 500)
     private String mediumUrl;
 
+    @Column(name = "pinterest_url", length = 500)
+    private String pinterestUrl;
+
+    @Column(name = "external_url", length = 500)
+    private String externalUrl;
+
+    @Column(name = "affiliate_url", length = 500)
+    private String affiliateUrl;
+
     @Column(length = 500)
     private String caption;
+
+    @Column(length = 500)
+    private String tags;
 
     @Column(length = 255)
     private String place;
@@ -94,6 +114,22 @@ public class Post {
         this.slug = slug;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public ContentType getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(ContentType contentType) {
+        this.contentType = contentType;
+    }
+
     public String getImageUrl() {
         return imageUrl;
     }
@@ -118,12 +154,44 @@ public class Post {
         this.mediumUrl = mediumUrl;
     }
 
+    public String getPinterestUrl() {
+        return pinterestUrl;
+    }
+
+    public void setPinterestUrl(String pinterestUrl) {
+        this.pinterestUrl = pinterestUrl;
+    }
+
+    public String getExternalUrl() {
+        return externalUrl;
+    }
+
+    public void setExternalUrl(String externalUrl) {
+        this.externalUrl = externalUrl;
+    }
+
+    public String getAffiliateUrl() {
+        return affiliateUrl;
+    }
+
+    public void setAffiliateUrl(String affiliateUrl) {
+        this.affiliateUrl = affiliateUrl;
+    }
+
     public String getCaption() {
         return caption;
     }
 
     public void setCaption(String caption) {
         this.caption = caption;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 
     public String getPlace() {

@@ -38,13 +38,15 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByMoodIdsExcluding(@Param("moodIds") List<Long> moodIds,
                                        @Param("excludeId") Long excludeId);
 
-    // Search (Section 3.6) - simple LIKE-based search across caption/place/collection/mood.
+    // Search (Section 3.6) - simple LIKE-based search across title/caption/tags/place/collection/mood.
     // Can be swapped for a native FULLTEXT MATCH...AGAINST query later if performance requires it.
     @Query("""
         SELECT DISTINCT p FROM Post p
         LEFT JOIN p.collections c
         LEFT JOIN p.moods m
-        WHERE LOWER(p.caption) LIKE LOWER(CONCAT('%', :q, '%'))
+        WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :q, '%'))
+           OR LOWER(p.caption) LIKE LOWER(CONCAT('%', :q, '%'))
+           OR LOWER(p.tags) LIKE LOWER(CONCAT('%', :q, '%'))
            OR LOWER(p.place) LIKE LOWER(CONCAT('%', :q, '%'))
            OR LOWER(c.name) LIKE LOWER(CONCAT('%', :q, '%'))
            OR LOWER(m.name) LIKE LOWER(CONCAT('%', :q, '%'))
