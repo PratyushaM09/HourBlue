@@ -4,6 +4,32 @@
 
 ---
 
+## Current MVP Direction
+
+HourBlue is now being built as a Pinterest-adjacent visual discovery MVP, not as a full future platform in one pass.
+
+The MVP should prove one core loop:
+
+```txt
+visitor lands on HourBlue
+-> browses visual ideas
+-> opens one idea/post
+-> sees related content
+-> continues exploring
+```
+
+Current locked decisions:
+
+- Public UI language: use "Ideas" for the visitor-facing experience.
+- Code/domain direction: use "Post" as the broader content concept.
+- Backend naming: renamed the active backend domain from `Photo` to `Post` while the project is still early.
+- Public route direction: prefer `/post/[slug]` over `/memory/[slug]`.
+- Batch upload: defer to V1.5 unless V1 finishes early.
+- Monetization: V1 is link-ready through optional Pinterest, external, and affiliate URLs, but does not include payments.
+- Root README: keep short; long planning belongs in this file.
+
+---
+
 ## Status
 - [x] Name finalized: **HourBlue**
 - [x] Repo created
