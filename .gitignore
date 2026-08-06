@@ -5,11 +5,16 @@
 
 # Backend (Maven/Java)
 target/
+.m2/
 
 # Frontend (Node/Next.js)
 node_modules/
 .next/
+.next-dev-logs/
 out/
+
+# Package manager caches
+.pnpm-store/
 
 # Env files - never commit secrets
 .env

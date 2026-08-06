@@ -52,7 +52,7 @@ Goal: Build a polished, production-style MVP for a Pinterest-adjacent visual dis
 
 - The repo already contains a clean monorepo structure with `backend/`, `frontend/`, and `docs/`.
 - Backend has initial entities, repositories, JWT auth, Cloudinary signature support, and health endpoint.
-- Frontend is still a placeholder that calls backend health.
+- Frontend now has a mock public browsing slice for the core Ideas loop.
 - Existing planning doc is strong but still describes HourBlue more as a personal visual journal than a Pinterest-adjacent product.
 - Root `README.md` has been restored to a short project overview; the long plan lives in `docs/PLANNING.md`.
 - Some symbols display garbled in PowerShell output; verify whether this is terminal encoding or actual file encoding before editing docs heavily.
@@ -89,17 +89,17 @@ Tasks:
 
 ### Milestone 2: Public Frontend With Mock Data
 
-Status: Not started
+Status: In progress
 
 Tasks:
 
-- Build layout shell and navigation.
-- Build reusable visual card.
-- Build masonry grid.
-- Build home feed.
-- Build category and mood listing pages.
-- Build post detail page.
-- Build related posts UI.
+- Build layout shell and navigation. Done.
+- Build reusable visual card. Done.
+- Build masonry grid. Done.
+- Build home feed. Done.
+- Build category and mood listing pages. Done.
+- Build post detail page. Done.
+- Build related posts UI. Done.
 
 ### Milestone 3: Connect Frontend to Backend
 
@@ -170,7 +170,13 @@ Tasks:
 - Added service and controller tests.
 - Added `.http` examples in `backend/requests/hourblue-api.http`.
 - Verification note: Codex attempted Maven again with IntelliJ's bundled JBR, but this sandbox still fails during real compilation with `Access is denied` while reading dependency jars. Run `mvn clean test` from your normal IntelliJ/PowerShell setup before committing.
+- Started Milestone 2: public frontend with mock data.
+- Added mock Post data while keeping visitor-facing UI language as Ideas.
+- Added a real public browsing slice: home feed, idea detail pages, collections, collection detail, moods, mood detail, and related Ideas.
+- Added reusable frontend components: minimal nav, idea card, masonry grid, tile grid, and related Ideas strip.
+- Added Unsplash image host support to Next image config for mock visuals.
+- Verification note: frontend production build passed with `pnpm build`; local dev server is available at `http://127.0.0.1:3000`.
 
 ## Next Step
 
-Run Maven verification locally, then commit Milestone 1B. After that, continue with frontend mock/public browsing or admin create/edit API discussion.
+Review the mock frontend in the browser, then commit Milestone 2. After that, decide whether to connect this UI to the public backend API or build admin create/edit APIs.

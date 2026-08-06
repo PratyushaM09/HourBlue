@@ -18,7 +18,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "HourBlue",
-  description: "A personal visual journal.",
+  description: "A visual discovery site for quiet ideas, moods, and useful inspiration.",
 };
 
 export default function RootLayout({

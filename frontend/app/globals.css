@@ -10,3 +10,11 @@
 body {
   @apply bg-paper text-charcoal;
 }
+
+::selection {
+  @apply bg-dusk text-paper;
+}
+
+img {
+  @apply bg-charcoal/5;
+}
