@@ -1,0 +1,10 @@
+@baseUrl = http://localhost:8080
+
+### Health check
+GET {{baseUrl}}/api/health
+
+### Public post feed
+GET {{baseUrl}}/api/posts?page=0&size=24
+
+### Public post detail
+GET {{baseUrl}}/api/posts/sample-post-slug
