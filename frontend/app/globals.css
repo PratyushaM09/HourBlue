@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --font-display: var(--font-playfair);
-  --font-body: var(--font-inter);
+  --font-display: Georgia, "Times New Roman", serif;
+  --font-body: Inter, "Segoe UI", Arial, sans-serif;
 }
 
 body {
