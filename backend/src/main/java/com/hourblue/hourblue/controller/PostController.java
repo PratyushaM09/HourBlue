@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/posts")
 public class PostController {
@@ -29,5 +31,10 @@ public class PostController {
     @GetMapping("/{slug}")
     public PublicPostDetailResponse getPost(@PathVariable String slug) {
         return postService.getPostBySlug(slug);
+    }
+
+    @GetMapping("/{slug}/related")
+    public List<PublicPostSummaryResponse> getRelatedPosts(@PathVariable String slug) {
+        return postService.getRelatedPostsBySlug(slug);
     }
 }

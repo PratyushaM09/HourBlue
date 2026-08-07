@@ -65,10 +65,30 @@ class PostControllerTest {
     }
 
     @Test
+    void getRelatedPostsReturnsPublicPostSummaries() throws Exception {
+        postService.relatedPosts.put("misty-morning", List.of(summary("related-post", "Related Post")));
+
+        mockMvc.perform(get("/api/posts/misty-morning/related"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].slug").value("related-post"))
+                .andExpect(jsonPath("$[0].title").value("Related Post"));
+    }
+
+    @Test
     void getPostReturns404WhenPostDoesNotExist() throws Exception {
         postService.notFoundSlugs.add("missing");
 
         mockMvc.perform(get("/api/posts/missing"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("Post not found: missing"))
+                .andExpect(jsonPath("$.status").value(404));
+    }
+
+    @Test
+    void getRelatedPostsReturns404WhenPostDoesNotExist() throws Exception {
+        postService.notFoundSlugs.add("missing");
+
+        mockMvc.perform(get("/api/posts/missing/related"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("Post not found: missing"))
                 .andExpect(jsonPath("$.status").value(404));
@@ -118,6 +138,7 @@ class PostControllerTest {
 
         private Page<PublicPostSummaryResponse> posts = Page.empty();
         private final Map<String, PublicPostDetailResponse> details = new HashMap<>();
+        private final Map<String, List<PublicPostSummaryResponse>> relatedPosts = new HashMap<>();
         private final List<String> notFoundSlugs = new ArrayList<>();
 
         StubPostService() {
@@ -135,6 +156,14 @@ class PostControllerTest {
                 throw new PostNotFoundException(slug);
             }
             return details.get(slug);
+        }
+
+        @Override
+        public List<PublicPostSummaryResponse> getRelatedPostsBySlug(String slug) {
+            if (notFoundSlugs.contains(slug)) {
+                throw new PostNotFoundException(slug);
+            }
+            return relatedPosts.getOrDefault(slug, List.of());
         }
     }
 }

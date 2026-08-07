@@ -19,24 +19,26 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     Page<Post> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
-    // Related-posts priority #1 (Section 4.4): same place + same date, excluding the current post
+    // Related-posts legacy helper: same place + same date, excluding the current post.
     List<Post> findTop8ByPlaceAndCapturedDateAndIdNot(String place, LocalDate capturedDate, Long id);
 
-    // Related-posts priority #2: shares at least one collection
     @Query("""
         SELECT DISTINCT p FROM Post p JOIN p.collections c
         WHERE c.id IN :collectionIds AND p.id <> :excludeId
+        ORDER BY p.createdAt DESC
         """)
     List<Post> findByCollectionIdsExcluding(@Param("collectionIds") List<Long> collectionIds,
                                              @Param("excludeId") Long excludeId);
 
-    // Related-posts priority #3: shares at least one mood
     @Query("""
         SELECT DISTINCT p FROM Post p JOIN p.moods m
         WHERE m.id IN :moodIds AND p.id <> :excludeId
+        ORDER BY p.createdAt DESC
         """)
     List<Post> findByMoodIdsExcluding(@Param("moodIds") List<Long> moodIds,
                                        @Param("excludeId") Long excludeId);
+
+    List<Post> findByTagsContainingIgnoreCaseAndIdNotOrderByCreatedAtDesc(String tag, Long id);
 
     // Search (Section 3.6) - simple LIKE-based search across title/caption/tags/place/collection/mood.
     // Can be swapped for a native FULLTEXT MATCH...AGAINST query later if performance requires it.
@@ -56,4 +58,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findTop4ByIsFeaturedTrueOrderByCreatedAtDesc();
 
     List<Post> findTop4ByOrderByCreatedAtDesc();
+
+    List<Post> findTop8ByIsFeaturedTrueAndIdNotOrderByCreatedAtDesc(Long id);
+
+    List<Post> findTop8ByIdNotOrderByCreatedAtDesc(Long id);
 }

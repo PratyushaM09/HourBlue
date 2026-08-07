@@ -1,8 +1,8 @@
 package com.hourblue.hourblue.service;
 
-import com.hourblue.hourblue.dto.PublicPostDetailResponse;
 import com.hourblue.hourblue.dto.PublicCollectionResponse;
 import com.hourblue.hourblue.dto.PublicMoodResponse;
+import com.hourblue.hourblue.dto.PublicPostDetailResponse;
 import com.hourblue.hourblue.dto.PublicPostSummaryResponse;
 import com.hourblue.hourblue.exception.PostNotFoundException;
 import com.hourblue.hourblue.model.Collection;
@@ -27,7 +27,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -61,17 +60,25 @@ class PostServiceTest {
     @Test
     void getPostBySlugMapsDetailAndRelatedPostsInPriorityOrder() {
         Post post = post(1L, "misty-morning", "Misty Morning");
-        Post samePlace = post(2L, "same-place", "Same Place");
-        Post sharedCollection = post(3L, "shared-collection", "Shared Collection");
-        Post sharedMood = post(4L, "shared-mood", "Shared Mood");
+        Post sharedCollection = post(2L, "shared-collection", "Shared Collection");
+        Post sharedMood = post(3L, "shared-mood", "Shared Mood");
+        Post sharedTag = post(4L, "shared-tag", "Shared Tag");
+        Post featuredFallback = post(5L, "featured-fallback", "Featured Fallback");
+        Post recentFallback = post(6L, "recent-fallback", "Recent Fallback");
 
         when(postRepository.findBySlug("misty-morning")).thenReturn(Optional.of(post));
-        when(postRepository.findTop8ByPlaceAndCapturedDateAndIdNot("Jaipur", LocalDate.of(2026, 8, 1), 1L))
-                .thenReturn(List.of(samePlace));
         when(postRepository.findByCollectionIdsExcluding(List.of(10L), 1L))
-                .thenReturn(List.of(samePlace, sharedCollection));
+                .thenReturn(List.of(sharedCollection));
         when(postRepository.findByMoodIdsExcluding(List.of(20L), 1L))
                 .thenReturn(List.of(sharedMood));
+        when(postRepository.findByTagsContainingIgnoreCaseAndIdNotOrderByCreatedAtDesc("quiet", 1L))
+                .thenReturn(List.of(sharedTag));
+        when(postRepository.findByTagsContainingIgnoreCaseAndIdNotOrderByCreatedAtDesc("blue hour", 1L))
+                .thenReturn(List.of(sharedTag));
+        when(postRepository.findTop8ByIsFeaturedTrueAndIdNotOrderByCreatedAtDesc(1L))
+                .thenReturn(List.of(featuredFallback));
+        when(postRepository.findTop8ByIdNotOrderByCreatedAtDesc(1L))
+                .thenReturn(List.of(recentFallback));
 
         PublicPostDetailResponse response = postService.getPostBySlug("misty-morning");
 
@@ -82,7 +89,34 @@ class PostServiceTest {
         assertThat(response.affiliateUrl()).isEqualTo("https://affiliate.example/misty-morning");
         assertThat(response.relatedPosts())
                 .extracting(PublicPostSummaryResponse::slug)
-                .containsExactly("same-place", "shared-collection", "shared-mood");
+                .containsExactly("shared-collection", "shared-mood", "shared-tag",
+                        "featured-fallback", "recent-fallback");
+    }
+
+    @Test
+    void getRelatedPostsBySlugReturnsSummariesOnly() {
+        Post post = post(1L, "misty-morning", "Misty Morning");
+        Post sharedCollection = post(2L, "shared-collection", "Shared Collection");
+
+        when(postRepository.findBySlug("misty-morning")).thenReturn(Optional.of(post));
+        when(postRepository.findByCollectionIdsExcluding(List.of(10L), 1L))
+                .thenReturn(List.of(sharedCollection));
+        when(postRepository.findByMoodIdsExcluding(List.of(20L), 1L))
+                .thenReturn(List.of());
+        when(postRepository.findByTagsContainingIgnoreCaseAndIdNotOrderByCreatedAtDesc("quiet", 1L))
+                .thenReturn(List.of());
+        when(postRepository.findByTagsContainingIgnoreCaseAndIdNotOrderByCreatedAtDesc("blue hour", 1L))
+                .thenReturn(List.of());
+        when(postRepository.findTop8ByIsFeaturedTrueAndIdNotOrderByCreatedAtDesc(1L))
+                .thenReturn(List.of());
+        when(postRepository.findTop8ByIdNotOrderByCreatedAtDesc(1L))
+                .thenReturn(List.of());
+
+        List<PublicPostSummaryResponse> response = postService.getRelatedPostsBySlug("misty-morning");
+
+        assertThat(response)
+                .extracting(PublicPostSummaryResponse::slug)
+                .containsExactly("shared-collection");
     }
 
     @Test
@@ -95,19 +129,24 @@ class PostServiceTest {
     }
 
     @Test
-    void getPostBySlugSkipsRelatedQueriesWhenMetadataIsMissing() {
+    void getPostBySlugFallsBackToRecentPostsWhenMetadataIsMissing() {
         Post post = post(1L, "simple", "Simple");
-        post.setPlace(null);
-        post.setCapturedDate(null);
+        Post recentFallback = post(2L, "recent-fallback", "Recent Fallback");
+        post.setTags(null);
         post.setCollections(java.util.Set.of());
         post.setMoods(java.util.Set.of());
 
         when(postRepository.findBySlug("simple")).thenReturn(Optional.of(post));
+        when(postRepository.findTop8ByIsFeaturedTrueAndIdNotOrderByCreatedAtDesc(1L))
+                .thenReturn(List.of());
+        when(postRepository.findTop8ByIdNotOrderByCreatedAtDesc(1L))
+                .thenReturn(List.of(recentFallback));
 
         PublicPostDetailResponse response = postService.getPostBySlug("simple");
 
-        assertThat(response.relatedPosts()).isEmpty();
-        verify(postRepository).findBySlug("simple");
+        assertThat(response.relatedPosts())
+                .extracting(PublicPostSummaryResponse::slug)
+                .containsExactly("recent-fallback");
     }
 
     private Post post(Long id, String slug, String title) {

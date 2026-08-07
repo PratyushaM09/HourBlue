@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -45,24 +46,25 @@ public class PostService {
         return toDetailResponse(post, findRelatedPosts(post));
     }
 
+    @Transactional(readOnly = true)
+    public List<PublicPostSummaryResponse> getRelatedPostsBySlug(String slug) {
+        Post post = postRepository.findBySlug(slug)
+                .orElseThrow(() -> new PostNotFoundException(slug));
+
+        return findRelatedPosts(post).stream()
+                .map(this::toSummaryResponse)
+                .toList();
+    }
+
     private List<Post> findRelatedPosts(Post post) {
         Map<Long, Post> relatedById = new LinkedHashMap<>();
 
-        if (post.getPlace() != null && post.getCapturedDate() != null) {
+        List<Long> collectionIds = post.getCollections().stream()
+                .map(Collection::getId)
+                .toList();
+        if (!collectionIds.isEmpty()) {
             addRelatedPosts(relatedById,
-                    postRepository.findTop8ByPlaceAndCapturedDateAndIdNot(
-                            post.getPlace(), post.getCapturedDate(), post.getId()
-                    ));
-        }
-
-        if (relatedById.size() < RELATED_POST_LIMIT) {
-            List<Long> collectionIds = post.getCollections().stream()
-                    .map(Collection::getId)
-                    .toList();
-            if (!collectionIds.isEmpty()) {
-                addRelatedPosts(relatedById,
-                        postRepository.findByCollectionIdsExcluding(collectionIds, post.getId()));
-            }
+                    postRepository.findByCollectionIdsExcluding(collectionIds, post.getId()));
         }
 
         if (relatedById.size() < RELATED_POST_LIMIT) {
@@ -75,8 +77,40 @@ public class PostService {
             }
         }
 
+        if (relatedById.size() < RELATED_POST_LIMIT) {
+            for (String tag : sharedTagTerms(post)) {
+                if (relatedById.size() >= RELATED_POST_LIMIT) {
+                    break;
+                }
+                addRelatedPosts(relatedById,
+                        postRepository.findByTagsContainingIgnoreCaseAndIdNotOrderByCreatedAtDesc(tag, post.getId()));
+            }
+        }
+
+        if (relatedById.size() < RELATED_POST_LIMIT) {
+            addRelatedPosts(relatedById,
+                    postRepository.findTop8ByIsFeaturedTrueAndIdNotOrderByCreatedAtDesc(post.getId()));
+        }
+
+        if (relatedById.size() < RELATED_POST_LIMIT) {
+            addRelatedPosts(relatedById,
+                    postRepository.findTop8ByIdNotOrderByCreatedAtDesc(post.getId()));
+        }
+
         return new ArrayList<>(relatedById.values()).stream()
                 .limit(RELATED_POST_LIMIT)
+                .toList();
+    }
+
+    private List<String> sharedTagTerms(Post post) {
+        if (post.getTags() == null || post.getTags().isBlank()) {
+            return List.of();
+        }
+
+        return Arrays.stream(post.getTags().split(","))
+                .map(String::trim)
+                .filter(tag -> !tag.isBlank())
+                .distinct()
                 .toList();
     }
 

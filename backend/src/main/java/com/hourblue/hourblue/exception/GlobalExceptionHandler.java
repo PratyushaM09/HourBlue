@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(PostNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNotFound(PostNotFoundException ex) {
+    @ExceptionHandler({PostNotFoundException.class, CollectionNotFoundException.class})
+    public ResponseEntity<ErrorResponse> handleNotFound(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ErrorResponse(ex.getMessage(), 404));
     }
